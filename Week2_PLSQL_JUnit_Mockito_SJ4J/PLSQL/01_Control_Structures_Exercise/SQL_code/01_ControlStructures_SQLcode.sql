@@ -1,72 +1,80 @@
 
 
--- Create Customers table
+
 CREATE TABLE Customers (
-    CustomerID NUMBER PRIMARY KEY,
-    Name VARCHAR2(100),
-    Age NUMBER,
-    Balance NUMBER(10, 2),
-    IsVIP CHAR(1) DEFAULT 'N'
+  CustomerID NUMBER PRIMARY KEY,
+  Name VARCHAR2(100),
+  DOB DATE,
+  Balance NUMBER,
+  IsVIP CHAR(1) DEFAULT 'N'
 );
 
--- Create Loans table
 CREATE TABLE Loans (
-    LoanID NUMBER PRIMARY KEY,
-    CustomerID NUMBER REFERENCES Customers(CustomerID),
-    InterestRate NUMBER(5, 2),
-    DueDate DATE
+  LoanID NUMBER PRIMARY KEY,
+  CustomerID NUMBER,
+  LoanAmount NUMBER,
+  InterestRate NUMBER,
+  DueDate DATE,
+  FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
 );
 
--- Insert sample customers
-INSERT INTO Customers VALUES (1, 'Mohana Kumar', 65, 15000, 'N');
-INSERT INTO Customers VALUES (2, 'Kumar', 45, 8000, 'N');
-INSERT INTO Customers VALUES (3, 'Mohan ram', 70, 12000, 'N');
-INSERT INTO Customers VALUES (4, 'Manoj', 30, 5000, 'N');
 
--- Insert sample loans
-INSERT INTO Loans VALUES (101, 1, 7.5, SYSDATE + 15);
-INSERT INTO Loans VALUES (102, 2, 8.0, SYSDATE + 40);
-INSERT INTO Loans VALUES (103, 3, 6.5, SYSDATE + 25);
-INSERT INTO Loans VALUES (104, 4, 9.0, SYSDATE - 5);
+INSERT INTO Customers VALUES (1, 'John Doe', TO_DATE('1950-05-10', 'YYYY-MM-DD'), 12000, 'N');
+INSERT INTO Customers VALUES (2, 'Jane Smith', TO_DATE('1988-07-20', 'YYYY-MM-DD'), 8000, 'N');
+INSERT INTO Customers VALUES (3, 'Robert Brown', TO_DATE('1945-03-15', 'YYYY-MM-DD'), 15000, 'N');
+
+INSERT INTO Loans VALUES (1, 1, 5000, 5.5, SYSDATE + 15);
+INSERT INTO Loans VALUES (2, 2, 10000, 6.0, SYSDATE + 45);
+INSERT INTO Loans VALUES (3, 3, 7000, 5.0, SYSDATE + 20);
 
 COMMIT;
 
--- Scenario 1: Interest discount for senior citizens
+
+-- Scenario 1: Apply discount
+
+
 BEGIN
-    FOR cust IN (SELECT CustomerID FROM Customers WHERE Age > 60) LOOP
-        UPDATE Loans
-        SET InterestRate = InterestRate - 1
-        WHERE CustomerID = cust.CustomerID;
-    END LOOP;
-    DBMS_OUTPUT.PUT_LINE('Interest rate discount applied to senior citizens.');
+  FOR rec IN (SELECT L.LoanID, L.InterestRate, C.DOB 
+                FROM Loans L JOIN Customers C ON L.CustomerID = C.CustomerID)
+  LOOP
+    IF MONTHS_BETWEEN(SYSDATE, rec.DOB)/12 > 60 THEN
+      UPDATE Loans SET InterestRate = InterestRate - 1 WHERE LoanID = rec.LoanID;
+      DBMS_OUTPUT.PUT_LINE('Discount applied for Loan ' || rec.LoanID);
+    END IF;
+  END LOOP;
 END;
 /
 
--- Scenario 2: Promote VIPs
+
+-- Scenario 2: Promote VIP
+
+
 BEGIN
-    FOR cust IN (SELECT CustomerID FROM Customers WHERE Balance > 10000) LOOP
-        UPDATE Customers
-        SET IsVIP = 'Y'
-        WHERE CustomerID = cust.CustomerID;
-    END LOOP;
-    DBMS_OUTPUT.PUT_LINE('VIP status updated for eligible customers.');
+  FOR rec IN (SELECT CustomerID, Balance FROM Customers)
+  LOOP
+    IF rec.Balance > 10000 THEN
+      UPDATE Customers SET IsVIP = 'Y' WHERE CustomerID = rec.CustomerID;
+      DBMS_OUTPUT.PUT_LINE('Customer ' || rec.CustomerID || ' promoted to VIP.');
+    END IF;
+  END LOOP;
 END;
 /
 
--- Scenario 3: Print loan reminders
+
+-- Scenario 3: Send reminders
+
+
 BEGIN
-    FOR loan_rec IN (
-        SELECT L.LoanID, C.Name, L.DueDate
-        FROM Loans L JOIN Customers C ON L.CustomerID = C.CustomerID
-        WHERE L.DueDate BETWEEN SYSDATE AND SYSDATE + 30
-    ) LOOP
-        DBMS_OUTPUT.PUT_LINE('Reminder: ' || loan_rec.Name ||
-                             ', your loan (ID: ' || loan_rec.LoanID ||
-                             ') is due on ' || TO_CHAR(loan_rec.DueDate, 'DD-Mon-YYYY'));
-    END LOOP;
+  FOR rec IN (SELECT LoanID, CustomerID, DueDate FROM Loans WHERE DueDate <= SYSDATE + 30)
+  LOOP
+    DBMS_OUTPUT.PUT_LINE('Reminder: Loan ' || rec.LoanID || ' for Customer ' || rec.CustomerID || ' due on ' || rec.DueDate);
+  END LOOP;
 END;
 /
 
--- View Results
+
+-- Final Table Views
+
+
 SELECT * FROM Customers;
 SELECT * FROM Loans;
