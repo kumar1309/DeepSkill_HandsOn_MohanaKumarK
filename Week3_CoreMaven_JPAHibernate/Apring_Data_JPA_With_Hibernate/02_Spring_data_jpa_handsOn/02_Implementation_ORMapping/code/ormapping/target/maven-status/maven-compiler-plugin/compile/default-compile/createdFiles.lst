@@ -1,0 +1,10 @@
+com\example\ormapping\OrmLearnApplication.class
+com\example\ormapping\service\SkillService.class
+com\example\ormapping\repository\DepartmentRepository.class
+com\example\ormapping\repository\SkillRepository.class
+com\example\ormapping\model\Department.class
+com\example\ormapping\repository\EmployeeRepository.class
+com\example\ormapping\service\DepartmentService.class
+com\example\ormapping\service\EmployeeService.class
+com\example\ormapping\model\Skill.class
+com\example\ormapping\model\Employee.class
