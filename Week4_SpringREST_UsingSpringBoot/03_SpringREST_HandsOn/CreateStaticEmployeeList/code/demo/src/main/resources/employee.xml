@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util
+        https://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- Departments -->
+    <bean id="dept1" class="com.example.demo.model.Department">
+        <property name="id" value="1"/>
+        <property name="name" value="IT"/>
+    </bean>
+
+    <bean id="dept2" class="com.example.demo.model.Department">
+        <property name="id" value="2"/>
+        <property name="name" value="HR"/>
+    </bean>
+
+    <!-- Skills -->
+    <bean id="skillJava" class="com.example.demo.model.Skill">
+        <property name="id" value="1"/>
+        <property name="name" value="Java"/>
+    </bean>
+
+    <bean id="skillAngular" class="com.example.demo.model.Skill">
+        <property name="id" value="2"/>
+        <property name="name" value="Angular"/>
+    </bean>
+
+    <!-- Employees -->
+    <bean id="emp1" class="com.example.demo.model.Employee">
+        <property name="id" value="101"/>
+        <property name="name" value="Ram"/>
+        <property name="department" ref="dept1"/>
+        <property name="skills">
+            <list>
+                <ref bean="skillJava"/>
+                <ref bean="skillAngular"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="emp2" class="com.example.demo.model.Employee">
+        <property name="id" value="102"/>
+        <property name="name" value="Mohan"/>
+        <property name="department" ref="dept2"/>
+        <property name="skills">
+            <list>
+                <ref bean="skillJava"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="emp3" class="com.example.demo.model.Employee">
+        <property name="id" value="103"/>
+        <property name="name" value="Siva"/>
+        <property name="department" ref="dept1"/>
+        <property name="skills">
+            <list>
+                <ref bean="skillAngular"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="emp4" class="com.example.demo.model.Employee">
+        <property name="id" value="104"/>
+        <property name="name" value="Manoj"/>
+        <property name="department" ref="dept2"/>
+        <property name="skills">
+            <list>
+                <ref bean="skillJava"/>
+                <ref bean="skillAngular"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Employee List -->
+    <util:list id="employeeList">
+        <ref bean="emp1"/>
+        <ref bean="emp2"/>
+        <ref bean="emp3"/>
+        <ref bean="emp4"/>
+    </util:list>
+
+</beans>
